@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import BlogCard from "../components/BlogCard";
 import MyCard from "../components/MyCard";
+import Loading from '../components/Loading'
 const PhotoGallery = () => {
   const baseUri = process.env.REACT_APP_API_URL;
   const [myBlogs, setMyBlogs] = useState([]);
 
+  const [loading, setLoading] = useState(true);
   const fetchMyBlogs = async () => {
     try {
       const token = localStorage.getItem("authToken");
@@ -20,7 +22,8 @@ const PhotoGallery = () => {
       });
       const data = await res.json();
       setMyBlogs(data);
-      console.log(data);
+      //console.log(data);
+      setLoading(false);
       // Update state with fetched photos
     } catch (err) {
       //console.error('Error fetching photos:', err);
@@ -31,7 +34,17 @@ const PhotoGallery = () => {
     fetchMyBlogs(); // Fetch photos on component mount
   }, []);
 
-  console.log(myBlogs);
+  if (loading) {
+    return (
+      <div>
+        <div className="flex justify-center items-center h-screen">
+          <Loading
+
+          loading={loading} />
+        </div>
+      </div>
+    );
+  }
   return (
      myBlogs.length > 0 && (
       <div>

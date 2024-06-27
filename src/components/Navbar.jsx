@@ -1,11 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context api/Auth";
 import { toast } from "react-toastify";
+import { CgProfile } from "react-icons/cg";
+import { RxHamburgerMenu } from "react-icons/rx";
+import { RxCross2 } from "react-icons/rx";
+import ProfileMenu from "./ProfileMenu";
 
 const Navbar = () => {
   const auth = useAuth();
   console.log(auth);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   const navigate = useNavigate();
   //console.log(auth);
@@ -14,72 +23,73 @@ const Navbar = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     //toast.success("Sign out successful!");
-    toast.success('sign out successful!')
+    toast.success("sign out successful!");
     navigate("/signin");
   };
   return (
-    <div className="bg-gray-800 py-2 px-[10%]">
-      <div className="container mx-auto flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex-shrink-0  rounded-xl">
-          <img
-            src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-            alt="Logo"
-            className="h-10 rounded-[4px]"
-          />
-        </div>
+    <>
+      <nav className="bg-gray-800 lg:px-40">
+        <div className="container mx-auto flex justify-between items-center ">
+          <div className="flex items-center">
+            <img
+              src={`${process.env.PUBLIC_URL}/logo.png`}
+              alt="Logo"
+              className="h-14 w-20"
+            />
+            
+          </div>
 
-        {/* Navigation Links */}
-        <ul className="flex space-x-4 text-white">
-          <li>
-            <Link to="/" className="hover:text-gray-300">
+          <div className="hidden md:flex space-x-4 items-center">
+            <Link to="/" className="text-gray-300 hover:text-white">
               Home
             </Link>
-          </li>
-          <li>
-            <Link to="/my-blog" className="hover:text-gray-300">
+            <Link to="/my-blog" className="text-gray-300 hover:text-white">
               My Blog
             </Link>
-          </li>
-          <li>
-            <Link to="/create-blog" className="hover:text-gray-300">
+            <Link to="/create-blog" className="text-gray-300 hover:text-white">
               Create Blog
             </Link>
-          </li>
-          {auth.auth === true ? (
-            <>
-              <li>
-                <Link to="/profile" className="hover:text-gray-300">
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/signin"
-                  onClick={handleSignOut}
-                  className="hover:text-gray-300"
-                >
-                  Logout
-                </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link to="/signup" className="hover:text-gray-300">
-                  Sign Up
-                </Link>
-              </li>
-              <li>
-                <Link to="/signin" className="hover:text-gray-300">
-                  Sign In
-                </Link>
-              </li>
-            </>
-          )}
-        </ul>
-      </div>
-    </div>
+            <ProfileMenu />
+          </div>
+          <div className="md:hidden flex justify-between items-center ">
+            <div className="mr-5">
+              <ProfileMenu />
+                
+            </div>
+            <div className="md:hidden">
+              {isOpen ? (
+                <RxCross2 size={25} color="white" onClick={toggleMenu} />
+              ) : (
+                <RxHamburgerMenu size={25} color="white" onClick={toggleMenu} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {isOpen && (
+          <div className="bg-blue md:hidden ">
+            <Link
+              to="/"
+              className="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+              Home
+            </Link>
+            <Link
+              to="/my-blog"
+              className="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+              My Blog
+            </Link>
+            <Link
+              to="/create-blog"
+              className="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+              Create Blog
+            </Link>
+          </div>
+        )}
+      </nav>
+    </>
   );
 };
 

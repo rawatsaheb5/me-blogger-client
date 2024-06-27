@@ -4,13 +4,15 @@ import { MdModeEditOutline } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import EditCommentCard from "./EditCommentCard";
 import { toast } from "react-toastify";
+import data from "../data/image";
 
 const CommentCard = ({ author, text, profilePic, createdAt, id, handleGetAllComments }) => {
   const baseUri = process.env.REACT_APP_API_URL;
   const formatedTime = formatTimeAgo(createdAt);
   const [yourComment, setYourComment] = useState(false);
   const [toggleEditComment, setToggleEditComment] = useState(false);
-
+  const [avatar, setAvatar] = useState(profilePic || data.profileImage
+  );
   //console.log('author',author)
   const handleToggleEditComment = () => {
     setToggleEditComment(!toggleEditComment);
@@ -45,22 +47,14 @@ const CommentCard = ({ author, text, profilePic, createdAt, id, handleGetAllComm
     }
   };
   
-  
-  
-  //console.log('isyour comment => ', yourComment)
 
-  let Avator =
-    "https://png.pngtree.com/png-clipart/20230404/original/pngtree-male-avator-icon-png-image_9025232.png";
-  if (profilePic !== "default_post_image.jpg") {
-    Avator = `{baseUri}uploads/` +profilePic;
-  }
   return (
     <div className="flex flex-col p-4 m-2 bg-zinc-500 rounded">
       <div className="flex items-center justify-between ">
         <span className="flex items-center ">
           <img
             className="rounded-full h-10 w-10 object-cover border-2 border-red-600 mr-4	"
-            src={Avator}
+            src={avatar}
             alt="pic"
           />
           <span>

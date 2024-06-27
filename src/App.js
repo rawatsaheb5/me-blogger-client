@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+
 import './App.css';
 import { Routes , Route} from 'react-router-dom';
 import Login from './pages/Login';
@@ -12,9 +12,13 @@ import MyBlog from './pages/MyBlog'
 import EditPost from './components/EditPost';
 import PostPage from './pages/PostPage';
 import EditProfile from './pages/EditProfile';
+import Footer from './components/Footer';
+
 function App() {
   return (
     <>
+      <Navbar />
+      
       <Routes>
         <Route path='/signin' element={<Login />} />
         <Route path='/signup' element={<RegisterForm />} />
@@ -29,6 +33,7 @@ function App() {
         <Route path='/edit-profile' element={<EditProfile />} />
         
       </Routes>
+      <Footer />
     </>
   );
 }

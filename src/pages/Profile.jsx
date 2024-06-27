@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-
-
-
+import data from "../data/image";
+import Loading from "../components/Loading";
 const Profile = () => {
   const baseUri = process.env.REACT_APP_API_URL;
   const [userProfile, setUserProfile] = useState();
+  const [avatar, setAvatar] = useState(data?.profileImage);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   useEffect(() => {
     getYourProfile();
   }, []);
 
-  
   const handleEditProfile = () => {
-    navigate('/edit-profile');
-  }
+    navigate("/edit-profile");
+  };
   const getYourProfile = async () => {
     try {
       const token = localStorage.getItem("authToken");
@@ -27,32 +26,38 @@ const Profile = () => {
       });
       const data = await res.json();
       setUserProfile(data.user);
+      if (data?.user?.profilePic?.url) {
+        setAvatar(data?.user?.profilePic?.url )
+      }
+      
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
   };
 
-  if (!userProfile) {
-    return <div>
-      Loading...
-    </div>
+  if (loading) {
+    return (
+      <div>
+        <div className="flex justify-center items-center h-screen">
+          <Loading
+
+          loading={loading} />
+        </div>
+      </div>
+    );
   }
-  let Avator =
-    "https://png.pngtree.com/png-clipart/20230404/original/pngtree-male-avator-icon-png-image_9025232.png";
-  if (userProfile?.profilePic!== "default_post_image.jpg") {
-    Avator = `${baseUri}uploads/` + userProfile?.profilePic;
-  }
-  //console.log("userProfile => ", userProfile);
   
+
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg flex flex-col">
       <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">
-        User Profile
+        My Profile
       </h2>
       <div className="flex items-center ">
         <img
           className="rounded-full h-20 w-20 object-cover border-2 border-red-600	mr-14"
-          src={Avator}
+          src={avatar}
           alt="profile-pic"
         />
         <h3 className="font-bold text-2xl">{userProfile?.username}</h3>
@@ -75,7 +80,7 @@ const Profile = () => {
           </div>
         )}
 
-        <div className="flex justify-between rounded bg-gray-300 p-2 mb-2">
+        <div className="flex flex-wrap justify-between rounded bg-gray-300 p-2 mb-2">
           <h3>Email</h3>
 
           <div className="font-medium text-base">{userProfile?.email}</div>
@@ -85,6 +90,7 @@ const Profile = () => {
         Edit Profile
       </button>
     </div>
+    
   );
 };
 

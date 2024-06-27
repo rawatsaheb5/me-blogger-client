@@ -8,40 +8,8 @@ import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import CommentForm from "../components/CommentForm";
 import CommentCard from "../components/CommentCard";
+import data from "../data/image";
 
-
-const userImage =
-  "https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png";
-
-function formatTimeAgo(createdTime) {
-  const currentTime = new Date();
-  const updatedTime = new Date(createdTime);
-
-  const timeDifference = currentTime - updatedTime;
-  const seconds = Math.floor(timeDifference / 1000); // Convert milliseconds to seconds
-  const minutes = Math.floor(seconds / 60); // Convert seconds to minutes
-  const hours = Math.floor(minutes / 60); // Convert minutes to hours
-  const days = Math.floor(hours / 24); // Convert hours to days
-
-  if (hours < 24) {
-    if (hours === 0) {
-      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
-    } else {
-      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-    }
-  } else if (days <= 10) {
-    return `${days} day${days !== 1 ? "s" : ""} ago`;
-  } else {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-    };
-    return updatedTime.toLocaleDateString("en-US", options);
-  }
-}
 
 const PostPage = () => {
 
@@ -51,6 +19,7 @@ const PostPage = () => {
   const [post, setPost] = useState();
   const [isLoggedInUserLikedPost, setIsLoggedInUserLikedPost] = useState(false);
   const [comments, setComments] = useState();
+  const [avatar, setAvatar] = useState(data.profileImage);
   const navigate = useNavigate();
 
   const id = useLocation().state;
@@ -77,7 +46,7 @@ const PostPage = () => {
       console.log(error);
     }
   };
-  // for like
+  
 
   const clickToLikes = async () => {
     try {
@@ -112,6 +81,9 @@ const PostPage = () => {
       const res = await fetch(`${baseUri}api/post/author/${id}`);
       const data = await res.json();
       setPostAuthor(data);
+      if (data.author?.profilePic) {
+        setAvatar(data.author?.profilePic?.url);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -142,18 +114,9 @@ const PostPage = () => {
 
   const formattedTime = formatTimeAgo(post?.createdAt);
 
-  //console.log("postauthor => ", postAuthor);
+  console.log('post => ', comments)
 
-
-  console.log('my commnets => ', comments)
-  if (!postAuthor) {
-    return <div>Loading...</div>;
-  }
-  let Avator =
-    "https://png.pngtree.com/png-clipart/20230404/original/pngtree-male-avator-icon-png-image_9025232.png";
-  if (postAuthor?.author?.profilePic !== "default_post_image.jpg") {
-    Avator = `${baseUri}uploads/` + postAuthor?.author.profilePic;
-  }
+ 
   return (
     <div className="flex flex-col max-w-lg w-full ml-[20%] mb-[4%] rounded-lg shadow-lg  overflow-hidden">
       <div className="w-full p-6 flex items-center ">
@@ -161,7 +124,7 @@ const PostPage = () => {
           <img
             className="rounded-full h-14 w-14 object-cover border-2 border-red-600	"
             src={
-             Avator
+             avatar
             }
             alt="author"
           />
@@ -183,7 +146,7 @@ const PostPage = () => {
 
       <div>
         <img
-          src={`${baseUri}uploads/` + post?.image}
+          src={post?.image?.url}
           alt="Blog Image"
           className=" h-48 w-full object-cover "
         />
@@ -218,7 +181,7 @@ const PostPage = () => {
               <CommentCard
                 author={item.author}
                 text={item.text}
-                profilePic={item.profilePic}
+                profilePic={item.profilePic?.url}
                 createdAt={item.createdAt}
                 id={item._id}
                 handleGetAllComments = {handleGetAllComments}
@@ -229,5 +192,37 @@ const PostPage = () => {
     </div>
   );
 };
+
+
+
+function formatTimeAgo(createdTime) {
+  const currentTime = new Date();
+  const updatedTime = new Date(createdTime);
+
+  const timeDifference = currentTime - updatedTime;
+  const seconds = Math.floor(timeDifference / 1000); // Convert milliseconds to seconds
+  const minutes = Math.floor(seconds / 60); // Convert seconds to minutes
+  const hours = Math.floor(minutes / 60); // Convert minutes to hours
+  const days = Math.floor(hours / 24); // Convert hours to days
+
+  if (hours < 24) {
+    if (hours === 0) {
+      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    } else {
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+    }
+  } else if (days <= 10) {
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  } else {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    };
+    return updatedTime.toLocaleDateString("en-US", options);
+  }
+}
 
 export default PostPage;

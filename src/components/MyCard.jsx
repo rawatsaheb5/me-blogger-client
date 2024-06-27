@@ -7,10 +7,8 @@ import { MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { formatTimeAgo } from "./BlogCard";
 import { toast } from "react-toastify";
-
-const userImage =
-  "https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png";
-
+import data from "../data/image";
+import Loading from './Loading'
 
 
 const BlogCard = ({ id, fetchMyBlogs }) => {
@@ -18,6 +16,8 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [postAuthor, setPostAuthor] = useState(null);
   const [post, setPost] = useState();
+  const [avatar, setAvatar] = useState(data.profileImage);
+  const [loading, setLoading] = useState(true);
   const [isLoggedInUserLikedPost, setIsLoggedInUserLikedPost] = useState(false);
   const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
       const res = await fetch(`${baseUri}api/post/single/${id}`);
       const data = await res.json();
       setPost(data);
-      
+      setLoading(false)
     } catch (error) {
       console.log(error);
     }
@@ -68,6 +68,9 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
       const res = await fetch(`${baseUri}api/post/author/${id}`);
       const data = await res.json();
       setPostAuthor(data);
+      if (data.author?.profilePic) {
+        setAvatar(data.author?.profilePic?.url);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -105,14 +108,7 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
 
 
 
-  if (!post) {
-    return <div>
-      Loading...
-    </div>
-  }
-  if (!postAuthor) {
-    return <div>Loading...</div>;
-  }
+  
   const handlePostEdit = async () => {
     navigate(`/post-edit/`, {
       state: {
@@ -125,10 +121,15 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
       },
     });
   };
-  let Avator =
-    "https://png.pngtree.com/png-clipart/20230404/original/pngtree-male-avator-icon-png-image_9025232.png";
-  if (postAuthor?.author?.profilePic !== "default_post_image.jpg") {
-    Avator = `${baseUri}uploads/` + postAuthor?.author?.profilePic;
+  
+  if (loading) {
+    return (
+      <div>
+        <div className="flex justify-center items-center h-screen">
+          <Loading loading={loading} />
+        </div>
+      </div>
+    );
   }
   return (
     <div className="flex flex-col max-w-lg w-full mx-auto mb-[4%] rounded-lg shadow-lg  overflow-hidden">
@@ -136,7 +137,7 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
         <div className=" ">
           <img
             className="rounded-full h-14 w-14 object-cover border-2 border-red-600	"
-            src={Avator}
+            src={avatar}
             alt="author"
           />
         </div>
@@ -150,12 +151,12 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
         </div>
       </div>
       <div className="p-6 pt-0">
-        <h3 className="text-xl font-semibold text-gray-800 mt-0 ">{post.title }</h3>
+        <h3 className="text-xl font-semibold text-gray-800 mt-0 ">{post?.title }</h3>
       </div>
 
       <div>
         <img
-          src={`${baseUri}uploads/`+post.image }
+          src={ post?.image.url}
           alt="Blog Image"
           className=" h-48 w-full object-cover "
         />
@@ -163,7 +164,7 @@ const BlogCard = ({ id, fetchMyBlogs }) => {
 
       <div className="pl-6 mt-2 mb-5">
         <p className="text-gray-700 font-medium text-base  mb-4">
-          {post.description}
+          {post?.description}
         </p>
       </div>
       <div className="pl-6 flex justify-start align-items pb-6">
